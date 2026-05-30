@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: /*[[${branding?.fontFamily ?: 'Helvetica, Arial, sans-serif'}]]*/;
+            margin: 0;
+            padding: 40px;
+            color: /*[[${branding?.headerTextColor ?: '#1f2937'}]]*/;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .header {
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid /*[[${branding?.primaryColor ?: '#3b82f6'}]]*/;
+            background-color: /*[[${branding?.headerBackgroundColor ?: '#f9fafb'}]]*/;
+        }
+
+        .logo {
+            max-width: /*[[${branding?.logoWidth ?: 150}]]*/px;
+            max-height: /*[[${branding?.logoHeight ?: 60}]]*/px;
+            object-fit: contain;
+        }
+
+        .invoice-title {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: /*[[${branding?.primaryColor ?: '#3b82f6'}]]*/;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: /*[[${branding?.headerBackgroundColor ?: '#f3f4f6'}]]*/;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            color: /*[[${branding?.primaryColor ?: '#3b82f6'}]]*/;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: /*[[${branding?.primaryColor ?: '#3b82f6'}]]*/;
+            color: white;
+            text-align: left;
+            padding: 0.75rem;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:nth-child(even) {
+            background-color: /*[[${branding?.headerBackgroundColor ?: '#f9fafb'}]]*/;
+        }
+
+        .totals {
+            text-align: right;
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: /*[[${branding?.headerBackgroundColor ?: '#f3f4f6'}]]*/;
+            border-left: 4px solid /*[[${branding?.accentColor ?: '#10b981'}]]*/;
+        }
+
+        .totals td {
+            padding: 0.5rem 0;
+        }
+
+        .total-amount {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: /*[[${branding?.accentColor ?: '#10b981'}]]*/;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        h4 {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        p {
+            margin: 0.25rem 0;
+            line-height: 1.5;
+        }
+
+        .invoice-info p {
+            margin: 0.1rem 0;
+        }
+
+        .company-details p {
+            margin: 0.1rem 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header flex justify-between items-center">
+        <div>
+            <div th:if="${branding != null and branding.hasLogo()}">
+                <img th:src="${branding.logoSource}" class="logo" th:alt="'Logo'" th:style="${branding.logoStyle}" />
+            </div>
+            <div th:unless="${branding != null and branding.hasLogo()}">
+                <h3 th:text="${invoice.serviceProvider?.name ?: 'Company Name'}" style="margin: 0;"></h3>
+            </div>
+        </div>
+        <div class="invoice-info">
+            <h2 class="invoice-title">INVOICE</h2>
+            <p><strong>Invoice #:</strong> <span th:text="${invoice.invoiceReference}"></span></p>
+            <p><strong>Date:</strong> <span th:text="${#temporals.format(invoice.invoiceDate, 'dd MMM yyyy')}"></span></p>
+            <p><strong>Due:</strong> <span th:text="${invoice.dueDate != null ? #temporals.format(invoice.dueDate, 'dd MMM yyyy') : 'Upon Receipt'}"></span></p>
+            <p th:if="${invoice.externalReferenceNumber != null}"><strong>Reference:</strong> <span th:text="${invoice.externalReferenceNumber}"></span></p>
+        </div>
+        <div class="company-details" style="text-align: right;">
+            <p><strong th:text="${invoice.serviceProvider?.name ?: 'Service Provider'}"></strong></p>
+            <p th:text="${invoice.serviceProvider?.email}"></p>
+            <p th:if="${invoice.serviceProvider?.address}" th:text="${invoice.serviceProvider.address}"></p>
+            <p th:if="${invoice.serviceProvider?.phoneNumber}" th:text="${invoice.serviceProvider.phoneNumber}"></p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">Bill To:</h3>
+        <div th:if="${invoice.recipient != null}">
+            <p><strong>Name:</strong> <span th:text="${invoice.recipient.name}">Recipient Name</span></p>
+            <p th:if="${invoice.recipient.billingAddress}"><strong>Address:</strong> <span th:text="${invoice.recipient.billingAddress}"></span></p>
+            <p th:if="${invoice.recipient.contactEmail}"><strong>Email:</strong> <span th:text="${invoice.recipient.contactEmail}"></span></p>
+            <p th:if="${invoice.recipient.phoneNumber}"><strong>Phone:</strong> <span th:text="${invoice.recipient.phoneNumber}"></span></p>
+        </div>
+        <div th:unless="${invoice.recipient != null}">
+            <p><strong>Customer:</strong> <span th:text="${invoice.customer?.fullName ?: 'Customer Name'}"></span></p>
+            <p th:if="${invoice.customer?.email}"><strong>Email:</strong> <span th:text="${invoice.customer.email}"></span></p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+        <tr th:if="${config != null and config.layoutType == 'HOURS_LOG'}">
+            <th>Description</th>
+            <th>Hours Worked</th>
+            <th>Hourly Rate</th>
+            <th>Total</th>
+        </tr>
+        <tr th:if="${config != null and config.layoutType == 'TRADITIONAL'}">
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+        </tr>
+        <tr th:if="${config != null and config.layoutType == 'CUSTOM'}">
+            <th th:each="col : ${config.columns}" th:text="${col.heading}"></th>
+        </tr>
+        <tr th:unless="${config != null}">
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Hours Log Layout -->
+        <tr th:if="${config != null and config.layoutType == 'HOURS_LOG'}" th:each="item : ${invoice.invoiceItems}">
+            <td th:text="${item.invoiceItemDescription?.description ?: 'Service Item'}"></td>
+            <td th:text="${item.hoursWorked ?: 0}"></td>
+            <td th:text="${#numbers.formatCurrency(item.hourlyRate ?: 0)}"></td>
+            <td th:text="${#numbers.formatCurrency(item.lineTotal ?: 0)}"></td>
+        </tr>
+        <!-- Traditional Layout -->
+        <tr th:if="${(config != null and config.layoutType == 'TRADITIONAL') or config == null}" th:each="item : ${invoice.invoiceItems}">
+            <td th:text="${item.invoiceItemDescription?.description ?: 'Service Item'}"></td>
+            <td th:text="${item.quantity ?: 1}"></td>
+            <td th:text="${#numbers.formatCurrency(item.unitPrice ?: 0)}"></td>
+            <td th:text="${#numbers.formatCurrency(item.lineTotal ?: 0)}"></td>
+        </tr>
+        <!-- Custom Layout -->
+        <tr th:if="${config != null and config.layoutType == 'CUSTOM'}" th:each="item : ${invoice.invoiceItems}">
+            <td th:each="col : ${config.columns}">
+                <span th:switch="${col.fieldName}">
+                    <span th:case="'description'" th:text="${item.invoiceItemDescription?.description ?: 'Service Item'}"></span>
+                    <span th:case="'quantity'" th:text="${item.quantity ?: 1}"></span>
+                    <span th:case="'unitPrice'" th:text="${#numbers.formatCurrency(item.unitPrice ?: 0)}"></span>
+                    <span th:case="'hoursWorked'" th:text="${item.hoursWorked ?: 0}"></span>
+                    <span th:case="'hourlyRate'" th:text="${#numbers.formatCurrency(item.hourlyRate ?: 0)}"></span>
+                    <span th:case="'lineTotal'" th:text="${#numbers.formatCurrency(item.lineTotal ?: 0)}"></span>
+                    <span th:case="*" th:text="'-'"></span>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <table style="width: 100%; border: none;">
+            <!-- Calculate subtotal by subtracting tax from total if tax exists -->
+            <tr th:if="${invoice.taxAmount != null and invoice.taxAmount > 0}">
+                <td style="border: none;"><strong>Subtotal:</strong></td>
+                <td style="border: none;" th:text="${#numbers.formatCurrency(invoice.totalAmount - invoice.taxAmount)}"></td>
+            </tr>
+            <tr th:if="${invoice.taxAmount != null and invoice.taxAmount > 0}">
+                <td style="border: none;"><strong>Tax:</strong></td>
+                <td style="border: none;" th:text="${#numbers.formatCurrency(invoice.taxAmount)}"></td>
+            </tr>
+            <tr>
+                <td class="total-amount" style="border: none;"><strong>Total Amount:</strong></td>
+                <td class="total-amount" style="border: none;" th:text="${#numbers.formatCurrency(invoice.totalAmount)} + ' ' + (${invoice.currency} ?: 'ZAR')"></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Payment Terms and Notes Section -->
+    <div th:if="${invoice.paymentTerms != null or invoice.notes != null}" class="section" style="margin-top: 2rem;">
+        <div th:if="${invoice.paymentTerms != null}">
+            <h4 class="section-title">Payment Terms:</h4>
+            <p th:text="${invoice.paymentTerms}"></p>
+        </div>
+        <div th:if="${invoice.notes != null}" style="margin-top: 1rem;">
+            <h4 class="section-title">Notes:</h4>
+            <p th:text="${invoice.notes}"></p>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

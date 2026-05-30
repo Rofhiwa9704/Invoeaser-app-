@@ -1,0 +1,70 @@
+/* Minimal Tailwind-like utilities for invoice PDF */
+
+body {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #111827; /* gray-900 */
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.container {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.flex {
+    display: flex;
+}
+.justify-between {
+    justify-content: space-between;
+}
+.items-center {
+    align-items: center;
+}
+.text-right {
+    text-align: right;
+}
+.text-left {
+    text-align: left;
+}
+.font-bold {
+    font-weight: 700;
+}
+.text-sm {
+    font-size: 0.875rem;
+}
+.text-lg {
+    font-size: 1.125rem;
+}
+.text-xl {
+    font-size: 1.25rem;
+}
+.mb-4 {
+    margin-bottom: 1rem;
+}
+.mt-4 {
+    margin-top: 1rem;
+}
+.border {
+    border: 1px solid #e5e7eb; /* gray-200 */
+}
+.border-b {
+    border-bottom: 1px solid #e5e7eb;
+}
+.p-2 {
+    padding: 0.5rem;
+}
+.p-4 {
+    padding: 1rem;
+}
+.bg-gray-100 {
+    background-color: #f3f4f6;
+}
+.w-full {
+    width: 100%;
+}
+.rounded {
+    border-radius: 0.25rem;
+}
